@@ -1,77 +1,70 @@
 <?php
 
-namespace AshAllenDesign\MailboxLayer\Tests\Unit\Classes\ValidationResult;
+namespace Jojostx\ElasticEmail\Tests\Unit\Classes\ValidationResult;
 
-use AshAllenDesign\MailboxLayer\Classes\ValidationResult;
-use AshAllenDesign\MailboxLayer\Tests\Unit\TestCase;
+use Jojostx\ElasticEmail\Classes\ValidationResult;
+use Jojostx\ElasticEmail\Tests\Unit\TestCase;
 use Carbon\Carbon;
+use Jojostx\ElasticEmail\Enums\EmailValidationStatus;
 
 class MakeFromResponseTest extends TestCase
 {
     /** @test */
-    public function new_object_is_returned_with_correct_fields_set_and_the_validatedAt_date_is_already_set()
+    public function new_object_is_returned_with_correct_fields_set_and_the_dateAdded_date_is_already_set()
     {
         Carbon::setTestNow(now());
 
         $responseData = [
-            'email'        => 'mai1l@ashallendesign.co.uk',
-            'did_you_mean' => 'mail@ashallendesign.co.uk',
-            'user'         => 'mai1l',
-            'domain'       => 'ashallendesign.co.uk',
-            'format_valid' => true,
-            'smtp_check'   => true,
-            'role'         => true,
+            'account'         => 'mail',
+            'domain'       => 'jojostx.co.uk',
+            'email'        => 'mail@jojostx.co.uk',
+            'suggestedSpelling' => 'mail@jojostx.co.uk',
             'disposable'   => false,
-            'free'         => false,
-            'score'        => 0.8,
-            'validated_at' => now(),
+            'role'         => true,
+            'reason'        => "invalid email",
+            'dateAdded' => now(),
+            'result'        => "None",
         ];
 
         $newObject = ValidationResult::makeFromResponse($responseData);
 
-        $this->assertSame('mai1l@ashallendesign.co.uk', $newObject->email);
-        $this->assertSame('mail@ashallendesign.co.uk', $newObject->didYouMean);
-        $this->assertSame('mai1l', $newObject->user);
-        $this->assertSame('ashallendesign.co.uk', $newObject->domain);
-        $this->assertTrue($newObject->formatValid);
-        $this->assertTrue($newObject->smtpCheck);
+        $this->assertSame('mail@jojostx.co.uk', $newObject->email);
+        $this->assertSame('mail@jojostx.co.uk', $newObject->suggestedSpelling);
+        $this->assertSame('mail', $newObject->account);
+        $this->assertSame('jojostx.co.uk', $newObject->domain);
         $this->assertTrue($newObject->role);
         $this->assertFalse($newObject->disposable);
-        $this->assertFalse($newObject->free);
-        $this->assertSame(0.8, $newObject->score);
-        $this->assertEquals(now(), $newObject->validatedAt);
+        $this->assertSame(EmailValidationStatus::NONE, $newObject->result);
+        $this->assertSame('invalid email', $newObject->reason);
+        $this->assertEquals(now(), $newObject->dateAdded);
     }
 
     /** @test */
-    public function new_object_is_returned_with_correct_fields_set_and_the_validatedAt_date_is_not_already_set()
+    public function new_object_is_returned_with_correct_fields_set_and_the_dateAdded_date_is_not_already_set()
     {
         Carbon::setTestNow(now());
 
         $responseData = [
-            'email'        => 'mai1l@ashallendesign.co.uk',
-            'did_you_mean' => 'mail@ashallendesign.co.uk',
-            'user'         => 'mai1l',
-            'domain'       => 'ashallendesign.co.uk',
-            'format_valid' => true,
-            'smtp_check'   => true,
-            'role'         => true,
+            'account'         => 'mail',
+            'domain'       => 'jojostx.co.uk',
+            'email'        => 'mail@jojostx.co.uk',
+            'suggestedSpelling' => 'mail@jojostx.co.uk',
             'disposable'   => false,
-            'free'         => false,
-            'score'        => 0.8,
+            'role'         => true,
+            'reason'        => "invalid email",
+            'result'        => "Risky",
         ];
 
         $newObject = ValidationResult::makeFromResponse($responseData);
 
-        $this->assertSame('mai1l@ashallendesign.co.uk', $newObject->email);
-        $this->assertSame('mail@ashallendesign.co.uk', $newObject->didYouMean);
-        $this->assertSame('mai1l', $newObject->user);
-        $this->assertSame('ashallendesign.co.uk', $newObject->domain);
-        $this->assertTrue($newObject->formatValid);
-        $this->assertTrue($newObject->smtpCheck);
+        $this->assertSame('mail@jojostx.co.uk', $newObject->email);
+        $this->assertSame('mail@jojostx.co.uk', $newObject->suggestedSpelling);
+        $this->assertSame('mail', $newObject->account);
+        $this->assertSame('jojostx.co.uk', $newObject->domain);
         $this->assertTrue($newObject->role);
         $this->assertFalse($newObject->disposable);
-        $this->assertFalse($newObject->free);
-        $this->assertSame(0.8, $newObject->score);
-        $this->assertEquals(now(), $newObject->validatedAt);
+        $this->assertSame(EmailValidationStatus::RISKY, $newObject->result);
+        $this->assertSame('invalid email', $newObject->reason);
+        $this->assertEquals(now(), $newObject->dateAdded);
     }
 }

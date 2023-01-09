@@ -1,8 +1,8 @@
 <?php
 
-namespace AshAllenDesign\MailboxLayer\Facades;
+namespace Jojostx\ElasticEmail\Facades;
 
-use AshAllenDesign\MailboxLayer\Classes\ValidationResult;
+use Jojostx\ElasticEmail\Classes\ValidationResult;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 
@@ -11,12 +11,10 @@ use Illuminate\Support\Facades\Facade;
  * @method static Collection checkMany(array $emailAddresses)
  * @method static self shouldCache(bool $shouldCache = true)
  * @method static self fresh(bool $fresh = true)
- * @method static self withHttps(bool $https = true)
- * @method static self withSmtpCheck(bool $smtpCheck = true)
  *
- * @see \AshAllenDesign\MailboxLayer\Classes\MailboxLayer
+ * @see \Jojostx\ElasticEmail\Classes\ElasticEmail
  */
-class MailboxLayer extends Facade
+class ElasticEmail extends Facade
 {
     /**
      * Get the registered name of the component.
@@ -27,6 +25,6 @@ class MailboxLayer extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'mailbox-layer';
+        return 'elasticemail';
     }
 }

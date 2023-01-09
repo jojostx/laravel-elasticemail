@@ -1,12 +1,31 @@
 <?php
 
-namespace AshAllenDesign\MailboxLayer\Classes;
+namespace Jojostx\ElasticEmail\Classes;
 
 use Carbon\Carbon;
+use Carbon\Exceptions\InvalidFormatException;
+use Illuminate\Support\Carbon as SupportCarbon;
 use Illuminate\Support\Str;
+use Jojostx\ElasticEmail\Enums\EmailValidationStatus;
 
 class ValidationResult
 {
+    /**
+     * The local part of the email address. Example:
+     * 'mail' in 'mail@jojostx.co.uk'.
+     *
+     * @var string
+     */
+    public $account;
+
+    /**
+     * The domain part of the email address. Example:
+     * 'jojostx.co.uk' in 'mail@jojostx.co.uk'.
+     *
+     * @var string
+     */
+    public $domain;
+
     /**
      * The email address that the validation was carried
      * out on.
@@ -20,63 +39,7 @@ class ValidationResult
      *
      * @var string
      */
-    public $didYouMean;
-
-    /**
-     * The local part of the email address. Example:
-     * 'mail' in 'mail@ashallendesign.co.uk'.
-     *
-     * @var string
-     */
-    public $user;
-
-    /**
-     * The domain part of the email address. Example:
-     * 'ashallendesign.co.uk' in 'mail@ashallendesign.co.uk'.
-     *
-     * @var string
-     */
-    public $domain;
-
-    /**
-     * Whether or not the syntax of the requested email is
-     * valid.
-     *
-     * @var bool
-     */
-    public $formatValid;
-
-    /**
-     * Whether or not the MX records for the requested
-     * domain could be found.
-     *
-     * @var bool
-     */
-    public $mxFound;
-
-    /**
-     * Whether or not the SMTP check of the requested email
-     * address succeeded.
-     *
-     * @var bool
-     */
-    public $smtpCheck;
-
-    /**
-     * Whether or not the requested email address is found
-     * to be part of a catch-all mailbox.
-     *
-     * @var bool
-     */
-    public $catchAll;
-
-    /**
-     * Whether or not the requested email is a role email
-     * address. Example: 'support@ashallendesign.co.uk'.
-     *
-     * @var bool
-     */
-    public $role;
+    public $suggestedSpelling;
 
     /**
      * Whether or not the requested email is disposable.
@@ -87,20 +50,26 @@ class ValidationResult
     public $disposable;
 
     /**
-     * Whether or not the requested email is a free email
-     * address.
+     * Whether or not the requested email is a role email
+     * address. Example: 'support@jojostx.co.uk'.
      *
      * @var bool
      */
-    public $free;
+    public $role;
 
     /**
-     * A score between 0 and 1 reflecting the quality and
-     * deliverability of the requested email address.
+     * All detected issues.
      *
-     * @var float
+     * @var string
      */
-    public $score;
+    public $reason;
+
+    /**
+     * The result of the validation check.
+     *
+     * @var EmailValidationStatus
+     */
+    public $result;
 
     /**
      * The date amd time when the validation check was run
@@ -108,7 +77,7 @@ class ValidationResult
      *
      * @var Carbon
      */
-    public $validatedAt;
+    public $dateAdded;
 
     /**
      * Build a new ValidationObject from the API response
@@ -129,10 +98,23 @@ class ValidationResult
             $validationResult->{$objectFieldName} = $value;
         }
 
-        if (empty($validationResult->validatedAt)) {
-            $validationResult->validatedAt = now();
+        try {
+            $validationResult->dateAdded = SupportCarbon::parse($validationResult->dateAdded);
+        } catch (InvalidFormatException $e) {
+            $validationResult->dateAdded = now();
         }
 
+        $validationResult->result = empty($validationResult->result) ?
+            EmailValidationStatus::NONE :
+            EmailValidationStatus::from(Str::lower($validationResult->result));
+
         return $validationResult;
+    }
+
+    public function prepareForCaching(): array
+    {
+        $result = (array) $this;
+
+        return \array_merge($result, ['result' => $this->result->value ?? 'none']);
     }
 }

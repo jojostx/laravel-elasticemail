@@ -1,9 +1,9 @@
 <?php
 
-namespace AshAllenDesign\MailboxLayer\Tests\Unit;
+namespace Jojostx\ElasticEmail\Tests\Unit;
 
-use AshAllenDesign\MailboxLayer\Facades\MailboxLayer;
-use AshAllenDesign\MailboxLayer\Providers\MailboxLayerProvider;
+use Jojostx\ElasticEmail\Facades\ElasticEmail;
+use Jojostx\ElasticEmail\Providers\ElasticEmailProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 abstract class TestCase extends OrchestraTestCase
@@ -16,7 +16,7 @@ abstract class TestCase extends OrchestraTestCase
      */
     protected function getPackageProviders($app)
     {
-        return [MailboxLayerProvider::class];
+        return [ElasticEmailProvider::class];
     }
 
     /**
@@ -28,7 +28,7 @@ abstract class TestCase extends OrchestraTestCase
     protected function getPackageAliases($app)
     {
         return [
-            'mailbox-layer' => MailboxLayer::class,
+            'elasticemail' => ElasticEmail::class,
         ];
     }
 }

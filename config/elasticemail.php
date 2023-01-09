@@ -4,12 +4,11 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Mailbox Layer API Key
+    | ElasticEmail API Key
     |--------------------------------------------------------------------------
     |
-    | Specify the Mailbox Layer API key here.
+    | Specify the ElasticEmail API key here.
     |
     */
-    'api_key' => env('MAILBOX_LAYER_API_KEY'),
-
+    'api_key' => env('ELASTICEMAIL_API_KEY'),
 ];
